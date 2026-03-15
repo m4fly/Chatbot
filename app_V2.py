@@ -11,9 +11,13 @@ st.caption("Powered by GPT-4.1-nano · Pinecone RAG · Multi-Agent Pipeline")
 try:
     openai_api_key = open("open_ai_key.txt", "r", encoding="utf-8").read().strip()
     pinecone_api_key = open("pinecone_api.txt", "r", encoding="utf-8").read().strip()
-except FileNotFoundError as e:
-    st.error(f"Missing API key file: {e}")
-    st.stop()
+except FileNotFoundError:
+    try:
+        openai_api_key = st.secrets["openai_api_key"]
+        pinecone_api_key = st.secrets["pinecone_api_key"]
+    except KeyError as e:
+        st.error(f"Missing API key: {e}")
+        st.stop()
 
 PINECONE_INDEX_NAME = "miniproject2-machine-learning-textbook"
 
