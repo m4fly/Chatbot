@@ -69,6 +69,9 @@ class Context_Rewriter_Agent:
             "that can be understood without any prior context. "
             "IMPORTANT: Replace ALL pronouns (it, this, that, they, these, them) "
             "with the specific concept or term they refer to from the conversation history. "
+            "IMPORTANT: Expand short or colloquial queries into full, descriptive questions. "  # ← new added
+            "For example, 'what's supervised learning' should become "                          # ← new added
+            "'What is supervised learning and how does it work?'  "                             # ← new added
             "If the latest message is already clear and standalone, return it as-is. "
             "Output ONLY the rewritten query, no explanation or extra text."
         )
