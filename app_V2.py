@@ -299,6 +299,26 @@ class Head_Agent:
         result = response.choices[0].message.content.strip()
         return None if result.upper() == "NONE" else result
 
+    def expand_query(self, query: str) -> str:
+        response = self.openai_client.chat.completions.create(
+            model="gpt-4.1-nano",
+            messages=[
+                {"role": "system", "content": (
+                    "You are a query expansion assistant for a Machine Learning knowledge base. "
+                    "Rewrite the user's question into a more detailed and descriptive version "
+                    "that will improve similarity search retrieval. "
+                    "Add relevant ML context and keywords while keeping the same meaning. "
+                    "For example: 'what is supervised learning' → "
+                    "'Explain supervised learning: definition, how it works, "
+                    "labeled data, training process, and examples.' "
+                    "Output ONLY the expanded query, no explanation."
+                )},
+                {"role": "user", "content": query}
+            ],
+            temperature=0
+        )
+        return response.choices[0].message.content.strip()
+
     def chat(self, user_query: str) -> tuple[str, str]:
         # Returns (response_text, agent_path) for display in UI
 
@@ -344,7 +364,8 @@ class Head_Agent:
                     "Query_Agent → Refused (Irrelevant)")
 
         # Step 5: Retrieve documents from Pinecone
-        docs = self.query_agent.query_vector_store(rewritten_query, k=5, namespace="ns2500")
+        expanded_query = self.expand_query(rewritten_query)
+        docs = self.query_agent.query_vector_store(expanded_query, k=5, namespace="ns2500")
 
         # Step 6: Verify document relevance
         if not self.relevant_docs_agent.get_relevance({"query": rewritten_query, "docs": docs}):
